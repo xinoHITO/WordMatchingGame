@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class DraggableUI : MonoBehaviour, IDragHandler, IPointerDownHandler
+public class DraggableUI : MonoBehaviour
 {
     private RectTransform dragRectTransform;
     private Canvas canvas;
@@ -27,13 +27,9 @@ public class DraggableUI : MonoBehaviour, IDragHandler, IPointerDownHandler
         }
     }
 
-    public void OnDrag(PointerEventData eventData)
+    void Update()
     {
-        dragRectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        dragRectTransform.SetAsLastSibling();
+        Vector3 mousePos = Input.mousePosition;
+        dragRectTransform.anchoredPosition = mousePos / canvas.scaleFactor;
     }
 }

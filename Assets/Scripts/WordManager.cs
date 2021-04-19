@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class WordManager : MonoBehaviour
 {
     [SerializeField]
     private string Word = "hola";
     [SerializeField]
-    private WordLetter letterPrefab;
+    private WordLetter LetterPrefab;
+    [SerializeField]
+    private TransparentLetter TransparentLetter;
     [SerializeField]
     private Transform LettersContainer;
 
     private List<WordLetter> Letters;
-    
 
     private void Start()
     {
@@ -21,7 +24,7 @@ public class WordManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-
+        TransparentLetter.HideLetter();
         CreateLetters(Word);
     }
 
@@ -31,6 +34,11 @@ public class WordManager : MonoBehaviour
         {
             bool result = CheckLetters();
             Debug.Log("result:" + result);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            TransparentLetter.HideLetter();
         }
     }
 
@@ -53,18 +61,23 @@ public class WordManager : MonoBehaviour
 
         for (int i = 0; i < word.Length; i++)
         {
-            WordLetter newLetter = Instantiate(letterPrefab, LettersContainer);
-            newLetter.Letter = ""+list[i];
-
+            WordLetter newLetter = Instantiate(LetterPrefab, LettersContainer);
+            newLetter.Letter = "" + list[i];
+            newLetter.OnLetterPressed += OnLetterPressed;
             Letters.Add(newLetter);
         }
 
+    }
+    private void OnLetterPressed(string letter)
+    {
+        TransparentLetter.Letter = letter;
+        TransparentLetter.ShowLetter();
     }
 
     public bool CheckLetters()
     {
         string currentWord = "";
-        
+
         foreach (var wordLetter in Letters)
         {
             currentWord += wordLetter.Letter;
