@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class WordManager : MonoBehaviour
 {
@@ -16,6 +14,8 @@ public class WordManager : MonoBehaviour
     private Transform LettersContainer;
 
     private List<WordLetter> Letters;
+    private List<float> LetterPositions;
+    private WordLetter SelectedLetter;
 
     private void Start()
     {
@@ -26,6 +26,7 @@ public class WordManager : MonoBehaviour
         }
         TransparentLetter.HideLetter();
         CreateLetters(Word);
+
     }
 
     void Update()
@@ -36,9 +37,39 @@ public class WordManager : MonoBehaviour
             Debug.Log("result:" + result);
         }
 
+        if (Input.GetMouseButton(0))
+        {
+            ReorderLetters();
+        }
+
         if (Input.GetMouseButtonUp(0))
         {
             TransparentLetter.HideLetter();
+            SelectedLetter = null;
+        }
+    }
+
+    private void ReorderLetters()
+    {
+        if (SelectedLetter != null)
+        {
+            Vector3 pos = TransparentLetter.GetComponent<RectTransform>().anchoredPosition;
+
+            for (int i = 0; i < Letters.Count; i++)
+            {
+                RectTransform letterTransform = Letters[i].GetComponent<RectTransform>();
+                var letterMin = LetterPositions[i] - (letterTransform.sizeDelta.x * 0.5f);
+                var letterMax = LetterPositions[i] + (letterTransform.sizeDelta.x * 0.5f);
+                Debug.Log(string.Format("letter X:{0} | min:{1} | max:{2}", letterTransform.anchoredPosition.x, letterMin, letterMax));
+
+                if (pos.x > letterMin && pos.x < letterMax)
+                {
+                    Debug.DrawLine(letterTransform.position, letterTransform.position + (Vector3.up * 100), Color.green);
+                    SelectedLetter.GetComponent<RectTransform>().SetSiblingIndex(i);
+                    break;
+                }
+            }
+            Debug.Log("-------------------");
         }
     }
 
@@ -67,10 +98,32 @@ public class WordManager : MonoBehaviour
             Letters.Add(newLetter);
         }
 
+        StartCoroutine(UnparentLetterCoroutine());
+
+        IEnumerator UnparentLetterCoroutine()
+        {
+            yield return null;
+            LetterPositions = new List<float>();
+            var originalParent = Letters[0].GetComponent<RectTransform>().parent;
+            foreach (WordLetter letter in Letters)
+            {
+                var letterTransform = letter.GetComponent<RectTransform>();
+                letterTransform.SetParent(transform.parent);
+            }
+            yield return null;
+            foreach (WordLetter letter in Letters)
+            {
+                var letterTransform = letter.GetComponent<RectTransform>();
+                LetterPositions.Add(letterTransform.anchoredPosition.x);
+                letterTransform.SetParent(originalParent);
+            }
+        }
+
     }
-    private void OnLetterPressed(string letter)
+    private void OnLetterPressed(WordLetter wordLetter)
     {
-        TransparentLetter.Letter = letter;
+        SelectedLetter = wordLetter;
+        TransparentLetter.Letter = wordLetter.Letter;
         TransparentLetter.ShowLetter();
     }
 
@@ -78,8 +131,9 @@ public class WordManager : MonoBehaviour
     {
         string currentWord = "";
 
-        foreach (var wordLetter in Letters)
+        foreach (Transform child in LettersContainer)
         {
+            WordLetter wordLetter = child.GetComponent<WordLetter>();
             currentWord += wordLetter.Letter;
         }
         Debug.Log("current word:" + currentWord);

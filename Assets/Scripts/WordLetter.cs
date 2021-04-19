@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 public class WordLetter : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    public delegate void OnLetterDelegate(string letter);
+    public delegate void OnLetterDelegate(WordLetter wordLetter);
     public OnLetterDelegate OnLetterPressed;
     public OnLetterDelegate OnLetterReleased;
 
@@ -42,13 +42,13 @@ public class WordLetter : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnPointerDown(PointerEventData eventData)
     {
         HideLetter();
-        OnLetterPressed?.Invoke(Letter);
+        OnLetterPressed?.Invoke(this);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         ShowLetter();
-        OnLetterPressed?.Invoke(Letter);
+        OnLetterReleased?.Invoke(this);
     }
 
     public void HideLetter()
