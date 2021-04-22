@@ -41,13 +41,11 @@ public class WordLetter : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        HideLetter();
         OnLetterPressed?.Invoke(this);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        ShowLetter();
         OnLetterReleased?.Invoke(this);
     }
 
