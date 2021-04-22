@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class WordManager : MonoBehaviour
 {
     [SerializeField]
     private string Word = "hola";
+
+    [SerializeField]
+    private float LetterSpacing = 200;
+
     [SerializeField]
     private WordLetter LetterPrefab;
     [SerializeField]
@@ -49,11 +54,14 @@ public class WordManager : MonoBehaviour
         }
     }
 
+    private RectTransform LetterToMove;
+
     private void ReorderLetters()
     {
-        if (SelectedLetter != null)
+        RectTransform TransparentLetterTransform = TransparentLetter.GetComponent<RectTransform>();
+        if (SelectedLetter != null && LetterToMove == null)
         {
-            Vector3 pos = TransparentLetter.GetComponent<RectTransform>().anchoredPosition;
+            Vector3 pos = TransparentLetterTransform.anchoredPosition;
 
             for (int i = 0; i < Letters.Count; i++)
             {
@@ -62,15 +70,24 @@ public class WordManager : MonoBehaviour
                 var letterMax = LetterPositions[i] + (letterTransform.sizeDelta.x * 0.5f);
                 Debug.Log(string.Format("letter X:{0} | min:{1} | max:{2}", letterTransform.anchoredPosition.x, letterMin, letterMax));
 
-                if (pos.x > letterMin && pos.x < letterMax)
+                if (Letters[i] != SelectedLetter &&
+                    pos.x > letterMin && pos.x < letterMax)
                 {
-                    Debug.DrawLine(letterTransform.position, letterTransform.position + (Vector3.up * 100), Color.green);
-                    SelectedLetter.GetComponent<RectTransform>().SetSiblingIndex(i);
+                    Debug.DrawLine(letterTransform.position, letterTransform.position + (Vector3.up * 100), Color.green, 0.5f);
+                    LetterToMove = letterTransform;
+                    //Start tween to swap letters around
+                    //TODO: Detect when tween finishes and reset LetterToMove to null
+                    //TODO: Find a way to handle multiple animations moving letters at the same time.
+                    RectTransform selectedLetterTransform = SelectedLetter.GetComponent<RectTransform>();
+                    LetterToMove.DOMoveX(selectedLetterTransform.position.x, 0.2f);
+                    selectedLetterTransform.DOMoveX(letterTransform.position.x, 0.2f);
+                    Debug.Log("STARTED TWEEN");
                     break;
                 }
             }
             Debug.Log("-------------------");
         }
+
     }
 
     private void CreateLetters(string word)
@@ -95,6 +112,20 @@ public class WordManager : MonoBehaviour
             WordLetter newLetter = Instantiate(LetterPrefab, LettersContainer);
             newLetter.Letter = "" + list[i];
             newLetter.OnLetterPressed += OnLetterPressed;
+
+            float posX = 0;
+            int halfLetters = word.Length / 2;
+            //odd
+            posX = (i - halfLetters) * (LetterSpacing);
+            //even
+            if (word.Length % 2 == 0)
+            {
+                posX += LetterSpacing * 0.5f;
+            }
+
+            Debug.Log(posX);
+
+            newLetter.GetComponent<RectTransform>().anchoredPosition = new Vector2(posX, 0);
             Letters.Add(newLetter);
         }
 
@@ -120,6 +151,7 @@ public class WordManager : MonoBehaviour
         }
 
     }
+
     private void OnLetterPressed(WordLetter wordLetter)
     {
         SelectedLetter = wordLetter;
