@@ -504,7 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 314c938a8b7df774f871db469aa4ba7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Word: ho
+  Word: hola
   LetterSpacing: 200
   LetterPrefab: {fileID: 2242263824780830464, guid: ad3fc05e0e8b75a4eac267bf0fe1f935, type: 3}
   TransparentLetter: {fileID: 918071522}
@@ -553,19 +553,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_SizeDelta.x
@@ -605,11 +605,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 209
+      value: -751
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -866
+      value: -326
       objectReference: {fileID: 0}
     - target: {fileID: 4898527113697063101, guid: 9f35ca762be61e64f9f71b213cd349b8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
