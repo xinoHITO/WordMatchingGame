@@ -19,7 +19,6 @@ public class WordManager : MonoBehaviour
     private Transform LettersContainer;
 
     private List<WordLetter> Letters;
-    private List<float> LetterPositions;
     private WordLetter SelectedLetter;
 
     private void Start()
@@ -66,9 +65,8 @@ public class WordManager : MonoBehaviour
             for (int i = 0; i < Letters.Count; i++)
             {
                 RectTransform letterTransform = Letters[i].GetComponent<RectTransform>();
-                var letterMin = LetterPositions[i] - (letterTransform.sizeDelta.x * 0.5f);
-                var letterMax = LetterPositions[i] + (letterTransform.sizeDelta.x * 0.5f);
-                Debug.Log(string.Format("letter X:{0} | min:{1} | max:{2}", letterTransform.anchoredPosition.x, letterMin, letterMax));
+                var letterMin = letterTransform.anchoredPosition.x - (letterTransform.sizeDelta.x * 0.5f);
+                var letterMax = letterTransform.anchoredPosition.x + (letterTransform.sizeDelta.x * 0.5f);
 
                 if (Letters[i] != SelectedLetter &&
                     pos.x > letterMin && pos.x < letterMax)
@@ -79,15 +77,27 @@ public class WordManager : MonoBehaviour
                     //TODO: Detect when tween finishes and reset LetterToMove to null
                     //TODO: Find a way to handle multiple animations moving letters at the same time.
                     RectTransform selectedLetterTransform = SelectedLetter.GetComponent<RectTransform>();
-                    LetterToMove.DOMoveX(selectedLetterTransform.position.x, 0.2f);
-                    selectedLetterTransform.DOMoveX(letterTransform.position.x, 0.2f);
-                    Debug.Log("STARTED TWEEN");
+                    LetterToMove.DOMoveX(selectedLetterTransform.position.x, 0.5f).OnComplete(OnLetterSwapFinished);
+                    selectedLetterTransform.DOMoveX(letterTransform.position.x, 0.5f);
+                    Debug.Log(string.Format("<color=yellow>posX: {0} | letter[{1}] X:{2} min:{3} max:{4}</color>", pos.x, i, letterTransform.anchoredPosition.x, letterMin, letterMax));
+                    Debug.Log("TWEEN STARTED");
+
                     break;
+                }
+                else
+                {
+                    Debug.Log(string.Format("<color=red>posX: {0} | letter[{1}] X:{2} min:{3} max:{4}</color>", pos.x, i, letterTransform.anchoredPosition.x, letterMin, letterMax));
                 }
             }
             Debug.Log("-------------------");
         }
 
+    }
+
+    private void OnLetterSwapFinished()
+    {
+        Debug.Log("TWEEN FINISHED");
+        LetterToMove = null;
     }
 
     private void CreateLetters(string word)
@@ -123,8 +133,6 @@ public class WordManager : MonoBehaviour
                 posX += LetterSpacing * 0.5f;
             }
 
-            Debug.Log(posX);
-
             newLetter.GetComponent<RectTransform>().anchoredPosition = new Vector2(posX, 0);
             Letters.Add(newLetter);
         }
@@ -134,19 +142,11 @@ public class WordManager : MonoBehaviour
         IEnumerator UnparentLetterCoroutine()
         {
             yield return null;
-            LetterPositions = new List<float>();
             var originalParent = Letters[0].GetComponent<RectTransform>().parent;
             foreach (WordLetter letter in Letters)
             {
                 var letterTransform = letter.GetComponent<RectTransform>();
                 letterTransform.SetParent(transform.parent);
-            }
-            yield return null;
-            foreach (WordLetter letter in Letters)
-            {
-                var letterTransform = letter.GetComponent<RectTransform>();
-                LetterPositions.Add(letterTransform.anchoredPosition.x);
-                letterTransform.SetParent(originalParent);
             }
         }
 
