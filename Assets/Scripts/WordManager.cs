@@ -12,6 +12,10 @@ public class WordManager : MonoBehaviour
     private float LetterSpacing = 200;
 
     [SerializeField]
+    private float LetterSwapTime = 0.2f;
+
+
+    [SerializeField]
     private WordLetter LetterPrefab;
     [SerializeField]
     private TransparentLetter TransparentLetter;
@@ -28,9 +32,15 @@ public class WordManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        TransparentLetter.HideLetter();
+        
         CreateLetters(Word);
 
+        StartCoroutine(DelayCoroutine());
+
+        IEnumerator DelayCoroutine() {
+            yield return null;
+            TransparentLetter.HideLetter();
+        }
     }
 
     void Update()
@@ -74,19 +84,19 @@ public class WordManager : MonoBehaviour
                     Debug.DrawLine(letterTransform.position, letterTransform.position + (Vector3.up * 100), Color.green, 0.5f);
                     LetterToMove = letterTransform;
                     //Start tween to swap letters around
-                    //TODO: Detect when tween finishes and reset LetterToMove to null
                     //TODO: Find a way to handle multiple animations moving letters at the same time.
+                    //Make it so letters being swapped are "tagged" as busy and this for ignores them.
+                    //The hidden letter should cancel and play another tween if you interrupt the swap.
                     RectTransform selectedLetterTransform = SelectedLetter.GetComponent<RectTransform>();
-                    LetterToMove.DOMoveX(selectedLetterTransform.position.x, 0.5f).OnComplete(OnLetterSwapFinished);
-                    selectedLetterTransform.DOMoveX(letterTransform.position.x, 0.5f);
+                    LetterToMove.DOMoveX(selectedLetterTransform.position.x, LetterSwapTime).OnComplete(OnLetterSwapFinished);
+                    selectedLetterTransform.DOMoveX(letterTransform.position.x, LetterSwapTime);
                     Debug.Log(string.Format("<color=yellow>posX: {0} | letter[{1}] X:{2} min:{3} max:{4}</color>", pos.x, i, letterTransform.anchoredPosition.x, letterMin, letterMax));
                     Debug.Log("TWEEN STARTED");
-
                     break;
                 }
                 else
                 {
-                    Debug.Log(string.Format("<color=red>posX: {0} | letter[{1}] X:{2} min:{3} max:{4}</color>", pos.x, i, letterTransform.anchoredPosition.x, letterMin, letterMax));
+                    Debug.Log(string.Format("<color=red>posX: {0} |  743     letter[{1}] X:{2} min:{3} max:{4}</color>", pos.x, i, letterTransform.anchoredPosition.x, letterMin, letterMax));
                 }
             }
             Debug.Log("-------------------");
